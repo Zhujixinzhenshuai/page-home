@@ -1,0 +1,179 @@
+{
+  "links": [
+    {
+      "title": "Gmail",
+      "url": "https://mail.google.com/",
+      "description": "Google 邮箱",
+      "group": "邮箱 / Email",
+      "icon": ""
+    },
+    {
+      "title": "Outlook",
+      "url": "https://outlook.live.com/",
+      "description": "微软邮箱",
+      "group": "邮箱 / Email",
+      "icon": ""
+    },
+    {
+      "title": "QQ 邮箱",
+      "url": "https://mail.qq.com/",
+      "description": "腾讯邮箱",
+      "group": "邮箱 / Email",
+      "icon": ""
+    },
+    {
+      "title": "ProtonMail",
+      "url": "https://proton.me/",
+      "description": "隐私邮箱",
+      "group": "邮箱 / Email",
+      "icon": ""
+    },
+    {
+      "title": "iCloud Mail",
+      "url": "https://www.icloud.com/mail",
+      "description": "苹果邮箱",
+      "group": "邮箱 / Email",
+      "icon": ""
+    },
+    {
+      "title": "GitHub",
+      "url": "https://github.com/",
+      "description": "代码托管",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "GitLab",
+      "url": "https://gitlab.com/",
+      "description": "代码托管",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "Cloudflare",
+      "url": "https://www.cloudflare.com/",
+      "description": "CDN 与安全",
+      "group": "Home",
+      "icon": ""
+    },
+    {
+      "title": "Vercel",
+      "url": "https://vercel.com/",
+      "description": "部署平台",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "Hugging Face",
+      "url": "https://huggingface.co/",
+      "description": "模型与 Spaces",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "YouTube",
+      "url": "https://www.youtube.com/",
+      "description": "视频平台",
+      "group": "Home",
+      "icon": ""
+    },
+    {
+      "title": "Netlify",
+      "url": "https://www.netlify.com/",
+      "description": "部署平台",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "Docker Hub",
+      "url": "https://hub.docker.com/",
+      "description": "容器镜像",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "Stack Overflow",
+      "url": "https://stackoverflow.com/",
+      "description": "程序员问答",
+      "group": "开发者工具 / Dev Tools",
+      "icon": ""
+    },
+    {
+      "title": "ChatGPT",
+      "url": "https://chat.openai.com/",
+      "description": "OpenAI 聊天",
+      "group": "AI 平台 / AI Platforms",
+      "icon": ""
+    },
+    {
+      "title": "Claude",
+      "url": "https://www.anthropic.com/",
+      "description": "Anthropic Claude",
+      "group": "AI 平台 / AI Platforms",
+      "icon": ""
+    },
+    {
+      "title": "Gemini",
+      "url": "https://gemini.google/",
+      "description": "Google Gemini",
+      "group": "AI 平台 / AI Platforms",
+      "icon": ""
+    },
+    {
+      "title": "Poe",
+      "url": "https://poe.com/",
+      "description": "多模型聊天平台",
+      "group": "AI 平台 / AI Platforms",
+      "icon": ""
+    },
+    {
+      "title": "MDN",
+      "url": "https://developer.mozilla.org/zh-CN/",
+      "description": "Web 开发文档",
+      "group": "学习资源 / Learning",
+      "icon": ""
+    },
+    {
+      "title": "W3Schools",
+      "url": "https://www.w3schools.com/",
+      "description": "前端教程",
+      "group": "学习资源 / Learning",
+      "icon": ""
+    },
+    {
+      "title": "Google",
+      "url": "https://www.google.com/",
+      "description": "搜索引擎",
+      "group": "搜索与导航 / Search & Explore",
+      "icon": ""
+    },
+    {
+      "title": "Bing",
+      "url": "https://www.bing.com/",
+      "description": "搜索引擎",
+      "group": "搜索与导航 / Search & Explore",
+      "icon": ""
+    },
+    {
+      "title": "19960102.xyz",
+      "url": "https://19960102.xyz/",
+      "description": "用户未开发站点 A",
+      "group": "我的站点 / My Sites",
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjgnIGhlaWdodD0nMTI4Jz48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPScjN2RkM2ZjJyByeD0nMjAnIC8+PHRleHQgeD0nNTAlJyB5PSc1NSUnIGZvbnQtc2l6ZT0nNTInIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyMwMDE4MjYnIGZvbnQtZmFtaWx5PSdOb3RvIFNhbnMgU0MsIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYnIGZvbnQtd2VpZ2h0PSc3MDAnPjE5OTY8L3RleHQ+PC9zdmc+"
+    },
+    {
+      "title": "kiss520.dpdns.org",
+      "url": "https://kiss520.dpdns.org/",
+      "description": "用户未开发站点 B",
+      "group": "我的站点 / My Sites",
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjgnIGhlaWdodD0nMTI4Jz48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPScjZjQ3MmI2JyByeD0nMjAnIC8+PHRleHQgeD0nNTAlJyB5PSc1NSUnIGZvbnQtc2l6ZT0nNTInIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyMyYjA2NDAnIGZvbnQtZmFtaWx5PSdOb3RvIFNhbnMgU0MsIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYnIGZvbnQtd2VpZ2h0PSc3MDAnPks8L3RleHQ+PC9zdmc+"
+    },
+    {
+      "title": "960102.dpdns.org",
+      "url": "https://960102.dpdns.org/",
+      "description": "当前托管站点",
+      "group": "我的站点 / My Sites",
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjgnIGhlaWdodD0nMTI4Jz48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPScjYzdiYWY3JyByeD0nMjAnIC8+PHRleHQgeD0nNTAlJyB5PSc1NSUnIGZvbnQtc2l6ZT0nNTInIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyMwNzEwMjknIGZvbnQtZmFtaWx5PSdOb3RvIFNhbnMgU0MsIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYnIGZvbnQtd2VpZ2h0PSc3MDAnPjk2MDwvdGV4dD48L3N2Zz4="
+    }
+  ]
+}
