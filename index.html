@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>风流の导航</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{--neon:#38bdf8;--accent:#7c3aed;}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:#071028;color:#e6eef6;transition:background .6s ease,color .4s ease;overflow:hidden;}
+  body.light{background:#f6fbff;color:#04243b;}
+  .center-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64vw;max-width:880px;min-width:320px;}
+  .panel{background:rgba(255,255,255,0.02);backdrop-filter:blur(6px);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03);}
+  body.light .panel{background:rgba(255,255,255,0.95);border:1px solid rgba(2,50,90,0.06);color:#04243b;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .title{font-weight:800;letter-spacing:0.6px;font-size:18px;}
+  .subtitle{font-size:12px;color:rgba(230,238,246,0.7);}
+  .controls{display:flex;gap:8px;align-items:center;}
+  .btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);padding:6px 10px;border-radius:8px;cursor:pointer;}
+  .search{width:220px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;}
+  .groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;}
+  .group{padding:6px;}
+  .group-title{font-size:12px;font-weight:700;margin-bottom:6px;color:var(--neon);}
+  body.light .group-title{color:#0b6b9a;}
+  .card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;}
+  .card.small{width:110px;height:96px;font-size:12px;}
+  .card:hover{transform:translateY(-6px);box-shadow:0 8px 26px rgba(2,6,23,0.6);}
+  .favicon{width:40px;height:40px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.06));}
+  .tag{font-size:12px;color:rgba(230,238,246,0.9);text-align:center;}
+  .tele{position:fixed;right:14px;top:50%;transform:translateY(-50%);background:rgba(2,6,23,0.6);padding:8px 10px;border-radius:10px;color:#fff;border:1px solid rgba(56,189,248,0.08);}
+  body.light .tele{background:linear-gradient(180deg,#fff,#f5fbff);color:#04243b;border:1px solid rgba(2,50,90,0.06);}
+  footer{margin-top:10px;font-size:12px;color:rgba(230,238,246,0.6);text-align:center;}
+  canvas#cursorCanvas{position:fixed;left:0;top:0;pointer-events:none;z-index:1500;}
+  @media (max-width:640px){.center-wrap{width:92vw}.groups{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body class="dark">
+<canvas id="bgCanvas"></canvas>
+<canvas id="cursorCanvas"></canvas>
+
+<div class="center-wrap">
+  <div class="panel">
+    <header>
+      <div>
+        <div class="title" id="siteTitle">风流の导航</div>
+        <div class="subtitle" id="siteDesc">暗色流星 / 亮色樱花 — 支持中英切换 • 点击卡片播放提示音</div>
+      </div>
+      <div class="controls">
+        <input id="search" class="search" placeholder="搜索 / Search" />
+        <button id="langBtn" class="btn">EN</button>
+        <button id="themeBtn" class="btn">切换主题</button>
+        <button id="musicBtn" class="btn">BGM</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="groups" class="groups"></div>
+    </main>
+
+    <footer>
+      © 2025 风流の导航 | Powered by Cloudflare Pages
+    </footer>
+  </div>
+</div>
+
+<div class="tele">Telegram: <strong>@mrfengliu</strong></div>
+
+<script>
+const fallbackLinks = null;
+
+const i18n = {
+  "zh": { searchPlaceholder: "搜索：网站名 / 描述 / 标签", musicOn: "关闭 BGM", musicOff: "开启 BGM", theme: "切换主题", lang: "EN" },
+  "en": { searchPlaceholder: "Search: site / description / tag", musicOn: "Turn BGM off", musicOff: "Turn BGM on", theme: "Toggle Theme", lang: "中" }
+};
+let lang = localStorage.getItem('lang') || 'zh';
+
+const groupsEl = document.getElementById('groups');
+const searchEl = document.getElementById('search');
+const langBtn = document.getElementById('langBtn');
+const themeBtn = document.getElementById('themeBtn');
+const musicBtn = document.getElementById('musicBtn');
+
+async function fetchLinks(){
+  try {
+    const r = await fetch('links.json', {cache: 'no-store'});
+    if(!r.ok) throw new Error('no file');
+    const data = await r.json();
+    return data.links;
+  } catch(e){
+    if(fallbackLinks) return fallbackLinks.links;
+    return [];
+  }
+}
+
+function render(links){
+  const groups = {};
+  links.forEach(l=>{ const g = l.group || '未分组'; if(!groups[g]) groups[g]=[]; groups[g].push(l); });
+  groupsEl.innerHTML = '';
+  Object.keys(groups).forEach(g=>{
+    const div = document.createElement('div'); div.className='group';
+    const title = document.createElement('div'); title.className='group-title'; title.textContent = g; div.appendChild(title);
+    const container = document.createElement('div'); container.style.display='grid'; container.style.gridTemplateColumns='repeat(2,1fr)'; container.style.gap='6px';
+    groups[g].slice(0,12).forEach(item=>{
+      const a = document.createElement('a'); a.className='card small'; a.href=item.url; a.target='_blank'; a.rel='noopener noreferrer';
+      a.addEventListener('click', ()=> playClick());
+      const img = document.createElement('img'); img.className='favicon'; img.style.width='40px'; img.style.height='40px';
+      img.src = item.icon && item.icon.length>0 ? item.icon : ('https://www.google.com/s2/favicons?sz=64&domain=' + (new URL(item.url).hostname));
+      const name = document.createElement('div'); name.className='tag'; name.textContent = item.title;
+      const desc = document.createElement('div'); desc.className='tag'; desc.style.opacity='0.7'; desc.style.fontSize='11px'; desc.textContent = item.description || '';
+      a.appendChild(img); a.appendChild(name); a.appendChild(desc);
+      container.appendChild(a);
+    });
+    div.appendChild(container); groupsEl.appendChild(div);
+  });
+}
+
+function normalize(s){ return (s||'').toString().toLowerCase(); }
+function applyFilter(links){ const q=normalize(searchEl.value); if(!q) return links; return links.filter(l=> normalize(l.title).includes(q) || normalize(l.description).includes(q) || normalize(l.group).includes(q)); }
+
+function applyLang(){
+  const t = i18n[lang];
+  searchEl.placeholder = t.searchPlaceholder;
+  musicBtn.textContent = audioOn ? t.musicOn : t.musicOff;
+  themeBtn.textContent = t.theme;
+  langBtn.textContent = t.lang;
+}
+langBtn.addEventListener('click', ()=>{ lang = (lang==='zh')?'en':'zh'; localStorage.setItem('lang', lang); applyLang(); });
+
+let theme = localStorage.getItem('theme') || 'dark';
+function applyTheme(){ if(theme==='dark'){ document.body.classList.remove('light'); } else { document.body.classList.add('light'); } }
+themeBtn.addEventListener('click', ()=>{ theme = (theme==='dark') ? 'light' : 'dark'; localStorage.setItem('theme', theme); applyTheme(); });
+
+let audioCtx, masterGain, bgGain, audioOn=false, bgPad, clickGain;
+function initAudio(){
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain(); masterGain.gain.value = 0.9; masterGain.connect(audioCtx.destination);
+    bgGain = audioCtx.createGain(); bgGain.gain.value = 0.05; bgGain.connect(masterGain);
+    const o1 = audioCtx.createOscillator(); o1.type='sine'; o1.frequency.value = 220;
+    const o2 = audioCtx.createOscillator(); o2.type='sine'; o2.frequency.value = 277;
+    const padGain = audioCtx.createGain(); padGain.gain.value = 0.0;
+    o1.connect(padGain); o2.connect(padGain); padGain.connect(bgGain);
+    const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.06;
+    const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 0.02;
+    lfo.connect(lfoGain); lfoGain.connect(padGain.gain);
+    o1.start(); o2.start(); lfo.start();
+    bgPad = {o1,o2,padGain,lfo,lfoGain};
+    clickGain = audioCtx.createGain(); clickGain.gain.value = 0.6; clickGain.connect(masterGain);
+  }catch(e){ console.warn('Audio init failed',e); }
+}
+function toggleBgm(){ if(!audioCtx) initAudio(); if(!audioOn){ audioCtx.resume(); bgGain.gain.setTargetAtTime(0.05, audioCtx.currentTime, 0.1); audioOn=true; } else { bgGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.2); audioOn=false; } applyLang(); }
+musicBtn.addEventListener('click', ()=> toggleBgm());
+function playClick(){ if(!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); osc.type='square'; osc.frequency.setValueAtTime(880, now); const g = audioCtx.createGain(); g.gain.setValueAtTime(0.0001, now); osc.connect(g); g.connect(clickGain); g.gain.exponentialRampToValueAtTime(0.5, now + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18); osc.start(now); osc.stop(now + 0.2); }
+
+/* Cursor trail */
+const cursorCanvas = document.getElementById('cursorCanvas'); const cursorCtx = cursorCanvas.getContext('2d');
+let cursorParticles=[]; function resizeCursors(){ cursorCanvas.width=innerWidth; cursorCanvas.height=innerHeight; } window.addEventListener('resize', resizeCursors); resizeCursors();
+window.addEventListener('mousemove', (e)=>{ cursorParticles.push({x:e.clientX,y:e.clientY,life:40,r:Math.random()*2+1,vx:(Math.random()-0.5)*0.6,vy:-0.2}); });
+function drawCursor(){ cursorCtx.clearRect(0,0,cursorCanvas.width,cursorCanvas.height); for(let i=cursorParticles.length-1;i>=0;i--){ const p=cursorParticles[i]; p.x+=p.vx; p.y+=p.vy; p.life--; cursorCtx.beginPath(); cursorCtx.fillStyle='rgba(56,189,248,'+(p.life/40*0.9)+')'; cursorCtx.arc(p.x,p.y,p.r,0,Math.PI*2); cursorCtx.fill(); if(p.life<=0) cursorParticles.splice(i,1); } requestAnimationFrame(drawCursor); } drawCursor();
+
+/* Background canvas */
+const bgCanvas = document.getElementById('bgCanvas'); const bgCtx = bgCanvas.getContext('2d');
+let W=innerWidth,H=innerHeight; function resizeBg(){ W=bgCanvas.width=innerWidth; H=bgCanvas.height=innerHeight; } window.addEventListener('resize', resizeBg); resizeBg();
+
+let stars=[],meteors=[],petals=[];
+function initStars(){ stars=[]; for(let i=0;i<220;i++){ stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.3,alpha:Math.random()*0.9+0.1,tw:Math.random()*2000}); } }
+function initPetals(){ petals=[]; for(let i=0;i<80;i++){ petals.push({ x: W - Math.random()*200, y: Math.random()*H, vx: -0.2 - Math.random()*0.8, vy: 0.2 + Math.random()*0.6, rot: Math.random()*Math.PI*2, rotv: (Math.random()-0.5)*0.02, s: 8 + Math.random()*10, alpha: 0.8 + Math.random()*0.2 }); } }
+initStars(); initPetals();
+
+let lastMeteor=0;
+function drawBg(){
+  bgCtx.clearRect(0,0,W,H);
+  if(theme==='dark'){
+    const g=bgCtx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#03050a'); g.addColorStop(1,'#071028'); bgCtx.fillStyle=g; bgCtx.fillRect(0,0,W,H);
+    for(let s of stars){ const flick=0.6+0.4*Math.sin(Date.now()/1000 + s.tw); bgCtx.beginPath(); bgCtx.fillStyle='rgba(255,255,255,'+(s.alpha * flick)+')'; bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2); bgCtx.fill(); }
+    if(Date.now()-lastMeteor > 2000 + Math.random()*4000){ meteors.push({x: Math.random()*W*0.8, y: Math.random()*H*0.6, vx: 6+Math.random()*8, vy: 2+Math.random()*3, life: 80}); lastMeteor = Date.now(); }
+    for(let i=meteors.length-1;i>=0;i--){ const m=meteors[i]; bgCtx.beginPath(); bgCtx.moveTo(m.x,m.y); bgCtx.lineTo(m.x - m.vx*6, m.y - m.vy*6); const grad = bgCtx.createLinearGradient(m.x,m.y, m.x - m.vx*6, m.y - m.vy*6); grad.addColorStop(0,'rgba(255,255,255,0.95)'); grad.addColorStop(1,'rgba(56,189,248,0.0)'); bgCtx.strokeStyle=grad; bgCtx.lineWidth=2.5; bgCtx.stroke(); bgCtx.beginPath(); bgCtx.fillStyle='rgba(255,255,255,0.9)'; bgCtx.arc(m.x,m.y,2.8,0,Math.PI*2); bgCtx.fill(); m.x+=m.vx; m.y+=m.vy; m.life--; if(m.life<=0) meteors.splice(i,1); }
+  } else {
+    const g = bgCtx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#fbfbff'); g.addColorStop(1,'#f0f7ff'); bgCtx.fillStyle=g; bgCtx.fillRect(0,0,W,H);
+    bgCtx.fillStyle='rgba(230,240,255,0.9)'; bgCtx.beginPath(); bgCtx.moveTo(W, H*0.15); bgCtx.quadraticCurveTo(W*0.55, H*0.25, W*0.7, H*0.9); bgCtx.lineTo(W, H); bgCtx.fill();
+    for(let i=petals.length-1;i>=0;i--){ const p=petals[i]; bgCtx.save(); bgCtx.translate(p.x,p.y); bgCtx.rotate(p.rot); bgCtx.fillStyle='rgba(245,200,230,'+p.alpha+')'; bgCtx.beginPath(); bgCtx.ellipse(0,0,p.s, p.s*0.6, 0, 0, Math.PI*2); bgCtx.fill(); bgCtx.restore(); p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotv; if(p.y>H+20||p.x<-40){ p.x=W - Math.random()*40; p.y=-10 - Math.random()*20; } }
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* load & init */
+let allLinks=[];
+(async ()=>{
+  allLinks = await fetchLinks();
+  if(allLinks.length===0 && fallbackLinks) allLinks = fallbackLinks.links;
+  render(allLinks);
+  applyLang(); applyTheme();
+})();
+
+searchEl.addEventListener('input', async ()=>{ const filtered = applyFilter(allLinks); render(filtered); });
+
+window.addEventListener('click', function initAudioOnFirstClick(){ if(!audioCtx) initAudio(); window.removeEventListener('click', initAudioOnFirstClick); });
+
+</script>
+</body>
+</html>
