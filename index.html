@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>风流の导航</title>
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--neon:#38bdf8;--accent:#7c3aed;}
+  html,body{height:100%;margin:0;font-family:'Noto Sans SC', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+  body{background:#071028;color:#e6eef6;transition:background .6s ease,color .4s ease;overflow:hidden;}
+  body.light{background:#f6fbff;color:#04243b;}
+  .top-wrap{position:fixed;left:50%;transform:translateX(-50%);top:12px;z-index:1200;width:100%;max-width:980px;padding:6px;text-align:center;}
+  .site-title{font-size:30px;font-weight:900;display:inline-block;position:relative;padding:6px 12px;border-radius:8px;}
+  .site-title .shine{position:absolute;left:-60%;top:0;width:60%;height:100%;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(56,189,248,0.35), rgba(124,58,237,0.35), rgba(255,255,255,0));transform:skewX(-20deg);animation:shine 3.5s linear infinite;border-radius:8px;}
+  @keyframes shine{0%{left:-80%}50%{left:120%}100%{left:120%}}
+  .theme-toggle{position:fixed;right:12px;top:12px;z-index:1300;padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);cursor:pointer;}
+  .center-wrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-45%);width:70vw;max-width:920px;min-width:320px;z-index:1200;}
+  .panel{background:rgba(255,255,255,0.02);backdrop-filter:blur(12px);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.04);} 
+  body.light .panel{background:rgba(255,255,255,0.95);border:1px solid rgba(2,50,90,0.06);color:#04243b;} 
+  header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;} 
+  .search{width:66%;min-width:260px;padding:12px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:inherit;text-align:center;font-size:16px;} 
+  body.light .search{background:rgba(255,255,255,0.95);border:1px solid rgba(2,50,90,0.06);} 
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px;} 
+  .filter-btn{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);cursor:pointer;font-weight:700;} 
+  .filter-btn.active{box-shadow:0 10px 30px rgba(56,189,248,0.06);transform:translateY(-3px);} 
+  body.light .filter-btn{background:rgba(255,255,255,0.92);border:1px solid rgba(2,50,90,0.06);} 
+  .groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:12px;align-items:start;justify-items:center;} 
+  .card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,background .12s ease;backdrop-filter:blur(10px);} 
+  body.light .card{background:rgba(255,255,255,0.95);border:1px solid rgba(2,50,90,0.06);} 
+  .card.small{width:110px;height:100px;font-size:13px;} 
+  .card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 14px 40px rgba(2,6,23,0.6);} 
+  .favicon{width:44px;height:44px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.06));} 
+  .tag{font-size:13px;color:rgba(230,238,246,0.95);text-align:center;line-height:1.05;} 
+  .tele{position:fixed;right:18px;bottom:18px;background:linear-gradient(180deg,#1da1f2,#0a7bdc);padding:10px;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 40px rgba(13,110,253,0.12);cursor:pointer;z-index:1300;} 
+  footer.global-footer{position:fixed;left:0;right:0;bottom:2px;text-align:center;font-size:13px;color:rgba(230,238,246,0.6);z-index:1200;} 
+  body.light footer.global-footer{color:#5b6b7a;} 
+  canvas#bgCanvas{position:fixed;left:0;top:0;pointer-events:none;z-index:1;} 
+  canvas#cursorCanvas{position:fixed;left:0;top:0;pointer-events:none;z-index:1500;} 
+  @media(max-width:720px){ .search{width:92%} .center-wrap{width:92vw;transform:translate(-50%,-42%)} .groups{grid-template-columns:repeat(2,1fr)} .site-title{font-size:20px} } 
+</style>
+</head>
+<body class="dark">
+<canvas id="bgCanvas"></canvas>
+<canvas id="cursorCanvas"></canvas>
+
+<div class="top-wrap">
+  <div class="site-title" id="siteTitle" aria-hidden="true">
+    风流の导航
+    <span class="shine" aria-hidden="true"></span>
+  </div>
+</div>
+
+<button class="theme-toggle" id="themeToggle" title="切换明暗">🌙</button>
+
+<div class="center-wrap">
+  <div class="panel">
+    <header>
+      <input id="search" class="search" placeholder="搜索 / Search" />
+      <div class="btn-row" id="btnRow" role="tablist" aria-label="分类切换"></div>
+    </header>
+    <main>
+      <div id="groups" class="groups" role="region" aria-live="polite"></div>
+    </main>
+  </div>
+</div>
+
+<div class="tele" id="teleBtn" title="联系 Telegram">✆</div>
+<footer class="global-footer">© 2025 风流の导航 | Powered by Cloudflare Pages</footer>
+
+<script>
+const DATA_URL = '/links.json';
+const BUTTONS = ['Home','邮箱 / Email','开发者工具 / Dev Tools','AI 平台 / AI Platforms','搜索与导航 / Search & Explore','学习资源 / Learning','我的站点 / My Sites'];
+let allLinks = [];
+let theme = localStorage.getItem('theme') || 'dark';
+
+const btnRow = document.getElementById('btnRow');
+const groupsEl = document.getElementById('groups');
+const searchEl = document.getElementById('search');
+const themeToggle = document.getElementById('themeToggle');
+const teleBtn = document.getElementById('teleBtn');
+
+function buildButtons(){ btnRow.innerHTML=''; BUTTONS.forEach(name=>{ const b=document.createElement('button'); b.className='filter-btn'; b.textContent = name==='Home' ? 'Home' : name; b.dataset.group = name; b.addEventListener('click', ()=>{ document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); showGroup(name); }); btnRow.appendChild(b); }); const first = btnRow.querySelector('button'); if(first) first.classList.add('active'); }
+
+async function loadLinks(){ try{ const r = await fetch(DATA_URL,{cache:'no-store'}); if(!r.ok) throw new Error('no file'); const d = await r.json(); allLinks = d.links || []; }catch(e){ console.warn('load links failed',e); allLinks = []; } }
+
+function showGroup(groupName){ groupsEl.innerHTML=''; if(groupName === 'Home'){ const core = ['Cloudflare','GitHub','Gmail','YouTube']; core.forEach(k=>{ const it = allLinks.find(x=> x.title.includes(k)); if(it) groupsEl.appendChild(createCard(it)); }); groupsEl.appendChild(createAddCard()); return; } const items = allLinks.filter(l=> l.group === groupName); if(items.length === 0){ const el = document.createElement('div'); el.textContent = '暂无内容'; el.style.padding='12px'; groupsEl.appendChild(el); return; } items.forEach(it=> groupsEl.appendChild(createCard(it))); }
+
+function createCard(item){ const a = document.createElement('a'); a.className = 'card small'; a.href = item.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.addEventListener('click', ()=> playClick()); const img = document.createElement('img'); img.className = 'favicon'; img.style.width='44px'; img.style.height='44px'; img.src = item.icon && item.icon.length>0 ? item.icon : ('https://www.google.com/s2/favicons?sz=64&domain=' + (new URL(item.url).hostname)); const name = document.createElement('div'); name.className = 'tag'; name.textContent = item.title; const desc = document.createElement('small'); desc.textContent = item.description || ''; name.appendChild(desc); a.appendChild(img); a.appendChild(name); return a; }
+
+function createAddCard(){ const a = document.createElement('div'); a.className='card small'; a.style.display='flex'; a.style.alignItems='center'; a.style.justifyContent='center'; a.style.fontWeight='700'; a.textContent='+ 添加位置'; a.addEventListener('click', ()=> alert('请在 links.json 中添加新链接或在 GitHub 仓库编辑')); return a; }
+
+searchEl.addEventListener('input', ()=>{ const q = searchEl.value.trim().toLowerCase(); const active = document.querySelector('.filter-btn.active'); const group = active ? active.dataset.group : 'Home'; if(!q){ showGroup(group); return; } const filtered = allLinks.filter(l=> (l.title + l.description + l.group).toLowerCase().includes(q)); groupsEl.innerHTML=''; filtered.forEach(it=> groupsEl.appendChild(createCard(it))); });
+
+teleBtn.addEventListener('click', ()=>{ const ok = confirm('将跳转到 Telegram 添加联系人 @mrfengliu，是否继续？'); if(ok) window.open('https://t.me/mrfengliu','_blank'); });
+
+let audioCtx, masterGain, bgGain, clickGain;
+function initAudio(){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); masterGain = audioCtx.createGain(); masterGain.gain.value = 0.95; masterGain.connect(audioCtx.destination); bgGain = audioCtx.createGain(); bgGain.gain.value = 0.16; bgGain.connect(masterGain); const freqs = [220,277,330]; const padGain = audioCtx.createGain(); padGain.gain.value = 0.0; const oscs = []; freqs.forEach(f=>{ const o = audioCtx.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.start(); o.connect(padGain); oscs.push(o); }); const lp = audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=900; padGain.connect(lp); lp.connect(bgGain); const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.04; const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 0.07; lfo.connect(lfoGain); lfoGain.connect(padGain.gain); lfo.start(); clickGain = audioCtx.createGain(); clickGain.gain.value = 0.9; clickGain.connect(masterGain); }catch(e){console.warn('Audio init failed', e);} }
+
+function startBg(){ if(!audioCtx) initAudio(); try{ audioCtx.resume(); bgGain.gain.setTargetAtTime(0.16, audioCtx.currentTime, 0.05); }catch(e){console.warn('resume failed',e);} }
+
+function playClick(){ if(!audioCtx) initAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(); o.type='square'; o.frequency.setValueAtTime(880, now); const g = audioCtx.createGain(); g.gain.setValueAtTime(0.0001, now); o.connect(g); g.connect(clickGain); g.gain.exponentialRampToValueAtTime(0.7, now + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18); o.start(now); o.stop(now + 0.22); }
+
+const cursorCanvas = document.getElementById('cursorCanvas'); const cursorCtx = cursorCanvas.getContext('2d'); let cursorParticles = [];
+function resizeCursor(){ cursorCanvas.width = innerWidth; cursorCanvas.height = innerHeight; }
+window.addEventListener('resize', resizeCursor); resizeCursor();
+window.addEventListener('mousemove', (e)=>{ cursorParticles.push({x:e.clientX,y:e.clientY,life:30,r:Math.random()*2+1,vx:(Math.random()-0.5)*0.45,vy:-0.2}); });
+function drawCursor(){ cursorCtx.clearRect(0,0,cursorCanvas.width,cursorCanvas.height); for(let i=cursorParticles.length-1;i>=0;i--){ const p = cursorParticles[i]; p.x += p.vx; p.y += p.vy; p.life--; cursorCtx.beginPath(); cursorCtx.fillStyle = 'rgba(56,189,248,'+(p.life/30*0.9)+')'; cursorCtx.arc(p.x,p.y,p.r,0,Math.PI*2); cursorCtx.fill(); if(p.life<=0) cursorParticles.splice(i,1); } requestAnimationFrame(drawCursor); } drawCursor();
+
+const bgCanvas = document.getElementById('bgCanvas'); const bgCtx = bgCanvas.getContext('2d'); let W=innerWidth,H=innerHeight; function resizeBg(){ W=bgCanvas.width=innerWidth; H=bgCanvas.height=innerHeight; } window.addEventListener('resize', resizeBg); resizeBg(); let stars=[],meteors=[],petals=[];
+function initStars(){ stars=[]; for(let i=0;i<220;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.3,alpha:Math.random()*0.9+0.1,tw:Math.random()*2000}); }
+function initPetals(){ petals=[]; for(let i=0;i<120;i++) petals.push({ x: W - Math.random()*220, y: Math.random()*H, vx: -0.2 - Math.random()*1.0, vy: 0.2 + Math.random()*0.8, rot: Math.random()*Math.PI*2, rotv: (Math.random()-0.5)*0.03, s: 8 + Math.random()*12, alpha: 0.7 + Math.random()*0.3 }); }
+initStars(); initPetals();
+let lastMeteor = 0;
+function drawBg(){ bgCtx.clearRect(0,0,W,H); if(theme==='dark'){ const g = bgCtx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#03050a'); g.addColorStop(1,'#071028'); bgCtx.fillStyle=g; bgCtx.fillRect(0,0,W,H); for(let s of stars){ const flick = 0.6 + 0.4*Math.sin(Date.now()/1000 + s.tw); bgCtx.beginPath(); bgCtx.fillStyle = 'rgba(255,255,255,'+(s.alpha * flick)+')'; bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2); bgCtx.fill(); } if(Date.now() - lastMeteor > 1200 + Math.random()*3000){ meteors.push({x: Math.random()*W*0.85, y: Math.random()*H*0.6, vx: 6+Math.random()*10, vy: 2+Math.random()*4, life: 90}); lastMeteor = Date.now(); } for(let i=meteors.length-1;i>=0;i--){ const m = meteors[i]; bgCtx.beginPath(); bgCtx.moveTo(m.x,m.y); bgCtx.lineTo(m.x - m.vx*8, m.y - m.vy*8); const grad = bgCtx.createLinearGradient(m.x,m.y, m.x - m.vx*8, m.y - m.vy*8); grad.addColorStop(0,'rgba(255,255,255,0.95)'); grad.addColorStop(1,'rgba(56,189,248,0.0)'); bgCtx.strokeStyle = grad; bgCtx.lineWidth = 2.8; bgCtx.stroke(); bgCtx.beginPath(); bgCtx.fillStyle='rgba(255,255,255,0.92)'; bgCtx.arc(m.x,m.y,3.2,0,Math.PI*2); bgCtx.fill(); m.x += m.vx; m.y += m.vy; m.life--; if(m.life<=0) meteors.splice(i,1); } } else { const g = bgCtx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#fbfbff'); g.addColorStop(1,'#f0f7ff'); bgCtx.fillStyle=g; bgCtx.fillRect(0,0,W,H); bgCtx.fillStyle='rgba(245,240,245,0.95)'; bgCtx.beginPath(); bgCtx.moveTo(W, H*0.12); bgCtx.quadraticCurveTo(W*0.6, H*0.2, W*0.68, H*0.9); bgCtx.lineTo(W, H); bgCtx.fill(); for(let i=petals.length-1;i>=0;i--){ const p = petals[i]; bgCtx.save(); bgCtx.translate(p.x,p.y); bgCtx.rotate(p.rot); bgCtx.fillStyle = 'rgba(245,200,230,'+p.alpha+')'; bgCtx.beginPath(); bgCtx.ellipse(0,0,p.s, p.s*0.6, 0, 0, Math.PI*2); bgCtx.fill(); bgCtx.restore(); p.x += p.vx; p.y += p.vy; p.rot += p.rotv; if(p.y>H+30 || p.x < -60){ p.x = W - Math.random()*40; p.y = -10 - Math.random()*60; } } } requestAnimationFrame(drawBg); }
+drawBg();
+
+(async function init(){ buildButtons(); await loadLinks(); const firstBtn = document.querySelector('.filter-btn'); if(firstBtn) firstBtn.classList.add('active'); showGroup('Home'); searchEl.placeholder = '搜索 / Search'; if(localStorage.getItem('theme')){ theme = localStorage.getItem('theme'); if(theme==='light') document.body.classList.add('light'); } themeToggle.addEventListener('click', ()=>{ theme = (theme==='dark') ? 'light' : 'dark'; localStorage.setItem('theme', theme); if(theme==='light') document.body.classList.add('light'); else document.body.classList.remove('light'); }); try{ initAudio(); startBg(); }catch(e){ console.warn(e); } if('serviceWorker' in navigator){ navigator.serviceWorker.register('/service-worker.js').catch(()=>console.warn('sw reg failed')); } })();
+
+window.addEventListener('click', function resumeAudioOnce(){ try{ if(!audioCtx) initAudio(); if(audioCtx) audioCtx.resume(); }catch(e){} window.removeEventListener('click', resumeAudioOnce); });
+
+</script>
+</body>
+</html>
