@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的未来导航站</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --cyan: #00ffff;
+      --bg-dark: radial-gradient(circle at center, #0a0f1f 0%, #000 100%);
+      --bg-light: url('https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=1920&q=80');
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background 0.5s ease, color 0.5s ease;
+      background-size: cover;
+      background-position: center;
+    }
+    body.dark {
+      background: var(--bg-dark);
+      color: #e0eaff;
+    }
+    body.light {
+      background-image: var(--bg-light);
+      color: #0a2540;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0, 255, 255, 0.1);
+      box-shadow: 0 0 12px rgba(0, 200, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    body.light .card {
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(0, 200, 255, 0.2);
+      box-shadow: 0 0 8px rgba(0, 200, 255, 0.15);
+      color: #002244;
+    }
+    .card:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.3);
+      transform: translateY(-4px);
+    }
+    .group-title {
+      border-left: 4px solid var(--cyan);
+      padding-left: 8px;
+      margin-top: 24px;
+      font-size: 1.5rem;
+      color: var(--cyan);
+    }
+    .search {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(0,255,255,0.2);
+    }
+    .search:focus {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0,255,255,0.3);
+    }
+    #themeToggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(0,255,255,0.3);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+      transition: all 0.3s ease;
+    }
+    #themeToggle:hover {
+      box-shadow: 0 0 10px rgba(0,255,255,0.4);
+    }
+  </style>
+</head>
+<body class="dark min-h-screen flex flex-col items-center p-6">
+  <button id="themeToggle" title="切换主题">🌙</button>
+  <h1 class="text-4xl font-bold text-cyan-400 mb-6 tracking-widest drop-shadow-lg">我的未来导航站</h1>
+  <input id="searchInput" type="text" placeholder="🔍 搜索网站..." class="search mb-8 w-full max-w-lg p-3 rounded-xl text-center text-lg bg-transparent text-cyan-100" />
+  <div id="content" class="w-full max-w-5xl"></div>
+
+  <script>
+    // ===============================
+    // 载入链接数据
+    // ===============================
+    async function loadLinks() {
+      const res = await fetch('links.json');
+      const data = await res.json();
+      renderLinks(data.links);
+    }
+
+    // ===============================
+    // 渲染分组卡片
+    // ===============================
+    function renderLinks(links) {
+      const grouped = {};
+      links.forEach(link => {
+        if (!grouped[link.group]) grouped[link.group] = [];
+        grouped[link.group].push(link);
+      });
+
+      const content = document.getElementById('content');
+      content.innerHTML = '';
+
+      for (const group in grouped) {
+        const section = document.createElement('div');
+        section.innerHTML = `<h2 class='group-title mb-4'>${group}</h2>`;
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-2 md:grid-cols-4 gap-4';
+
+        grouped[group].forEach(link => {
+          const card = document.createElement('a');
+          card.href = link.url;
+          card.target = '_blank';
+          card.className = 'card rounded-xl p-4 flex flex-col items-center justify-center text-center';
+          const icon = link.icon || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(link.url).hostname}`;
+          card.innerHTML = `
+            <img src="${icon}" class="w-10 h-10 mb-2" alt="">
+            <span class="font-semibold">${link.title}</span>
+            <p class="text-sm opacity-80">${link.description || ''}</p>
+          `;
+          grid.appendChild(card);
+        });
+        section.appendChild(grid);
+        content.appendChild(section);
+      }
+    }
+
+    // ===============================
+    // 搜索功能
+    // ===============================
+    document.getElementById('searchInput').addEventListener('input', async (e) => {
+      const query = e.target.value.toLowerCase();
+      const res = await fetch('links.json');
+      const data = await res.json();
+      const filtered = data.links.filter(link =>
+        link.title.toLowerCase().includes(query) ||
+        (link.description && link.description.toLowerCase().includes(query)) ||
+        (link.group && link.group.toLowerCase().includes(query))
+      );
+      renderLinks(filtered);
+    });
+
+    // ===============================
+    // 主题切换逻辑
+    // ===============================
+    const themeToggle = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.body.className = currentTheme;
+    themeToggle.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+
+    themeToggle.addEventListener('click', () => {
+      const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+      document.body.className = newTheme;
+      themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('theme', newTheme);
+    });
+
+    // ===============================
+    // 加载导航数据
+    // ===============================
+    loadLinks();
+
+    // ===============================
+    // 可选：替换亮色背景图片
+    // 若你想使用自己的图片，将文件命名为 "bg-light.jpg"
+    // 并放在项目根目录，然后修改上方 CSS:
+    //   --bg-light: url('bg-light.jpg');
+    // ===============================
+  </script>
+</body>
+</html>

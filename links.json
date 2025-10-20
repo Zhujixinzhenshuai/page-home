@@ -1,0 +1,34 @@
+{
+  "links": [
+    {
+      "title": "GitHub",
+      "url": "https://github.com",
+      "description": "全球最大的代码托管平台",
+      "group": "开发工具"
+    },
+    {
+      "title": "Cloudflare",
+      "url": "https://www.cloudflare.com",
+      "description": "CDN 与网络安全服务",
+      "group": "开发工具"
+    },
+    {
+      "title": "OpenAI",
+      "url": "https://openai.com",
+      "description": "人工智能研究与产品",
+      "group": "科技前沿"
+    },
+    {
+      "title": "MDN",
+      "url": "https://developer.mozilla.org",
+      "description": "Web 开发文档",
+      "group": "学习资源"
+    },
+    {
+      "title": "W3Schools",
+      "url": "https://w3schools.com",
+      "description": "Web 开发教程",
+      "group": "学习资源"
+    }
+  ]
+}
